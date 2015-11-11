@@ -1,0 +1,528 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="http://www.sungness.com/schema/coder"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.sungness.com/schema/coder ">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+
+    <xsd:annotation>
+        <xsd:documentation><![CDATA[
+    为代码生成器定义配置文档包含的所有元素。
+        ]]></xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:complexType name="identifiedType" abstract="true">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	The unique identifier for a bean. The scope of the identifier
+	is the enclosing bean factory.
+			]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="id" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	The unique identifier for a bean. A bean id may not be used more than once
+	within the same <beans> element.
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="configuration">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+    文档的根元素，用作所有其他元素的容器。
+            ]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="settings" maxOccurs="1">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+    系统设置容器，所有系统设置参数均包含在其中，如：是否将下划线转换成驼峰式。
+    每个文档只有一个设置容器定义。
+                        ]]></xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="setting" maxOccurs="unbounded">
+                                <xsd:annotation>
+                                    <xsd:documentation><![CDATA[
+    系统设置参数，可以有多个定义，但名称不能重复。
+                                    ]]></xsd:documentation>
+                                </xsd:annotation>
+                                <xsd:complexType>
+                                    <xsd:attributeGroup
+                                            ref="settingAttributes"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="properties" maxOccurs="1">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+    属性容器，所有系统属性均包含在其中，属性主要用于生成代码时的占位符替换。
+    每个文档只有一个属性容器定义。
+                        ]]></xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="property" maxOccurs="unbounded">
+                                <xsd:annotation>
+                                    <xsd:documentation><![CDATA[
+    属性，可以有多个定义，但名称不能重复。
+                                    ]]></xsd:documentation>
+                                </xsd:annotation>
+                                <xsd:complexType>
+                                    <xsd:attributeGroup
+                                            ref="propertyAttributes"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                        <xsd:attributeGroup ref="propertiesAttributes"/>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="templates" maxOccurs="1" minOccurs="1">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+    模版容器，所有模版定义均包含在其中，每个文档只有一个模版容器定义。
+                        ]]></xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                            <xsd:element name="template">
+                                <xsd:complexType>
+                                    <xsd:attributeGroup
+                                            ref="templateAttributes"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                        <xsd:attribute name="path" type="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation><![CDATA[
+    模板文件所在的根路径（相对于classpath）。
+                                ]]></xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:attribute>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="targetFiles" maxOccurs="1" minOccurs="0">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+    目标文件容器，所有目标文件定义均包含在其中，每个文档只有一个目标文件容器定义。
+                        ]]></xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                            <xsd:element name="targetFile">
+                                <xsd:complexType>
+                                    <xsd:attributeGroup
+                                            ref="targetFileAttributes"/>
+                                </xsd:complexType>
+                            </xsd:element>
+                        </xsd:sequence>
+                        <xsd:attribute name="path" type="xsd:string">
+                            <xsd:annotation>
+                                <xsd:documentation><![CDATA[
+    生成目标文件的基路径（绝对）。
+                                ]]></xsd:documentation>
+                            </xsd:annotation>
+                        </xsd:attribute>
+                    </xsd:complexType>
+                </xsd:element>
+
+                <xsd:element name="database" minOccurs="1"
+                             maxOccurs="unbounded">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+    源表容器，所有要生成代码的表均包含在其中，每个文档只有一个源表容器定义。
+                        ]]></xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:complexContent>
+                            <xsd:extension base="identifiedType">
+                                <xsd:group ref="databaseElements"/>
+                                <xsd:attributeGroup ref="databaseAttributes"/>
+                            </xsd:extension>
+                        </xsd:complexContent>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:group name="databaseElements">
+        <xsd:sequence>
+            <xsd:element ref="description" minOccurs="0"/>
+            <xsd:element ref="table" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="exclude" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:element name="table">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+    表定义，每个表可定义一个表相关的变量容器，如果无表定义，则指定数据库下所有表都将被生成。
+                        ]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                <xsd:element name="property" minOccurs="0"
+                             maxOccurs="unbounded">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[
+    表级别property，用于替换代码中的占位符。
+                                ]]></xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:attributeGroup ref="propertyAttributes"/>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+            <xsd:attributeGroup ref="tableAttributes"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="excludeType">
+        <xsd:sequence>
+            <xsd:element ref="description" minOccurs="0"/>
+            <xsd:choice minOccurs="0" maxOccurs="1">
+                <xsd:element ref="value"/>
+                <xsd:element ref="array"/>
+                <xsd:element ref="list"/>
+                <xsd:element ref="set"/>
+                <xsd:any namespace="##other" processContents="strict"/>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:element name="exclude" type="excludeType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+    按数据库生成代码时，可排除一个或多个表，exclude 包含要排除的表名列表。
+			]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:attributeGroup name="settingAttributes">
+        <xsd:attribute name="name" use="required" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	设置参数名称，在应用程序中根据该名称引用相应的value值。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="value" use="required" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	设置参数值，如果有参数，则值不能为空。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="propertiesAttributes">
+        <xsd:attribute name="resource" use="optional" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	属性资源文件名，带路径。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="url" use="optional" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	属性资源url地址。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="propertyAttributes">
+        <xsd:attribute name="name" use="required" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	属性名称，在应用程序中根据该名称引用相应的value值。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="value" use="required" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	属性值，如果有属性，则值不能为空。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="templateAttributes">
+        <xsd:attribute name="id" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	模版ID。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	模版文件名。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="path" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    模板路径（相对于基路径，如果基路径未配置，则其相对于classpath，可选）。
+                ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="targetFileAttributes">
+        <xsd:attribute name="id" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	目标文件ID。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="template" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    引用的模板ID，与 template 元素中的 id 属性相对应。
+                ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="nameExpression" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    生成的文件名称表达式，包括替换标识 nameExpressionSubstitute，不带相对路径，带扩展名。
+    例如：
+        nameExpressionSubstitute="myName"
+        nameExpression=${myName}Service.java
+    其格式必须复合Freemarker规则。
+                ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="path" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    生成的目标文件存放的路径，相对于基路径（targetFiles 的基路径 path），如果基路径未配置，
+    则其相对于classpath。
+                ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="recursive" type="xsd:boolean" use="optional"
+                       default="false">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    递归生成子表对应的文件。
+                ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="override" type="xsd:boolean" use="optional"
+                       default="false">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    是否覆盖原有文件 默认为false。
+                ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="databaseAttributes">
+        <xsd:attribute name="name" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	源数据库名，要生成代码文件的表所在的数据库。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="package" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	数据库对应的包名，用于替换包或路径中的占位符，占位符应符合[database.packageName]的形式。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="tableAttributes">
+        <xsd:attribute name="id" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+	数据库表ID。
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[
+    数据库表名。
+                ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+
+    <xsd:element name="description">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	Contains informative text describing the purpose of the enclosing element.
+	Used primarily for user documentation of XML bean definition documents.
+			]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType mixed="true">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <!-- base type for collections that have (possibly) typed nested values -->
+    <xsd:complexType name="collectionType">
+        <xsd:attribute name="value-type" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation source="java:java.lang.Class"><![CDATA[
+	The default Java type for nested values. Must be a fully qualified
+	class name.
+				]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- simple internal types -->
+    <xsd:simpleType name="defaultable-boolean">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="default"/>
+            <xsd:enumeration value="true"/>
+            <xsd:enumeration value="false"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:element name="value">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	Contains a string representation of a property value.
+	The property may be a string, or may be converted to the required
+	type using the JavaBeans PropertyEditor machinery. This makes it
+	possible for application developers to write custom PropertyEditor
+	implementations that can convert strings to arbitrary target objects.
+
+	Note that this is recommended for simple objects only. Configure
+	more complex objects by populating JavaBean properties with
+	references to other beans.
+			]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType mixed="true">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:attribute name="type" type="xsd:string">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+	The exact type that the value should be converted to. Only needed
+	if the type of the target property or constructor argument is
+	too generic: for example, in case of a collection element.
+					]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="array">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	An array can contain multiple inner bean, ref, collection, or value elements.
+	This configuration element will always result in an array, even when being
+	defined e.g. as a value for a map with value type Object.
+			]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="listOrSetType">
+                    <xsd:attribute name="merge" default="default"
+                                   type="defaultable-boolean">
+                        <xsd:annotation>
+                            <xsd:documentation><![CDATA[
+	Enables/disables merging for collections when using parent/child beans.
+							]]></xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="list">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	A list can contain multiple inner bean, ref, collection, or value elements.
+	A list can also map to an array type; the necessary conversion is performed
+	automatically.
+			]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="listOrSetType">
+                    <xsd:attribute name="merge" default="default"
+                                   type="defaultable-boolean">
+                        <xsd:annotation>
+                            <xsd:documentation><![CDATA[
+	Enables/disables merging for collections when using parent/child beans.
+							]]></xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="set">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+	A set can contain multiple inner bean, ref, collection, or value elements.
+			]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="listOrSetType">
+                    <xsd:attribute name="merge" default="default"
+                                   type="defaultable-boolean">
+                        <xsd:annotation>
+                            <xsd:documentation><![CDATA[
+	Enables/disables merging for collections when using parent/child beans.
+							]]></xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:attribute>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <!-- Collection Elements -->
+    <xsd:group name="collectionElements">
+        <xsd:sequence>
+            <xsd:element ref="description" minOccurs="0"/>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element ref="value"/>
+                <xsd:element ref="array"/>
+                <xsd:element ref="list"/>
+                <xsd:element ref="set"/>
+                <xsd:any namespace="##other" processContents="strict"
+                         minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:group>
+
+    <!-- 'list' and 'set' collection type -->
+    <xsd:complexType name="listOrSetType">
+        <xsd:complexContent>
+            <xsd:extension base="collectionType">
+                <xsd:group ref="collectionElements"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+</xsd:schema>
